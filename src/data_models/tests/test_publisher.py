@@ -1,8 +1,9 @@
 """Tests related to the publisher model."""
 import pytest
-from src.data_models.models import Publisher, BookSale
+from src.data_models.models import Publisher, BookSale, Book
 from datetime import datetime
 from django.db.models import Count, Q
+from django.db.utils import IntegrityError
 
 
 @pytest.mark.django_db(reset_sequences=True)
@@ -43,3 +44,39 @@ def test_getting_publishers_with_more_than_one_book():
     assert pubs_with_more_or_equal_one_book[0].booksale_set.all()[1] == book_2
 
     assert pubs_with_more_or_equal_one_book[0].num_books == 2
+
+
+@pytest.mark.django_db(reset_sequences=True)
+def test_get_book_by_its_id_returns_expected__book():
+    """."""
+    book_1 = Book(title="1")
+    book_2 = Book(title="2")
+    book_3 = Book(title="3")
+    book_1.save()
+    book_2.save()
+    book_3.save()
+
+    book = Book.objects.get(id="1")
+
+    assert book.id == 1
+    assert book.title == "1"
+
+
+@pytest.mark.django_db(reset_sequences=True)
+def test_two_different_books_can_not_have_same_title():
+    """."""
+    book_1 = Book(title="1")
+    book_2 = Book(title="1")
+    book_1.save()
+
+    with pytest.raises(IntegrityError) as error:
+        book_2.save()
+
+@pytest.mark.django_db(reset_sequences=True)
+def test_two_different_books_can_not_have_same_title_if_created_through_manager():
+    """."""
+    Book.objects.create(title="1")
+
+    with pytest.raises(IntegrityError) as error:
+        Book.objects.create(title="1")
+

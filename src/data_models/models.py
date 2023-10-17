@@ -6,6 +6,11 @@ class Book(models.Model):
     class Meta:
         """Meta class for the model."""
         db_table = "book"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["title"], name="unique_title_book"
+            )
+        ]
 
 class Publisher(models.Model):
     class Meta:
