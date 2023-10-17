@@ -18,6 +18,11 @@ class Publisher(models.Model):
         db_table = "publisher"
     name = models.CharField(max_length=300)
 
+    def add_book_with_tile(self, **kwargs):
+        """Adds a book for a publisher."""
+        book_sale = BookSale(publisher=self, **kwargs)
+        book_sale.save()
+
 class BookSale(models.Model):
     class Meta:
         """Meta class for the model."""

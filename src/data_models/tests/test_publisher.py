@@ -80,3 +80,21 @@ def test_two_different_books_can_not_have_same_title_if_created_through_manager(
     with pytest.raises(IntegrityError) as error:
         Book.objects.create(title="1")
 
+
+@pytest.mark.django_db(reset_sequences=True)
+def test_we_can_add_book_for_publisher():
+    """."""
+    publisher = Publisher.objects.create(name="FairPubs")
+
+    assert list(publisher.booksale_set.all()) == []
+
+    publisher.add_book_with_tile(
+        name="name 1",
+        pages=10,
+        price=10.20,
+        rating=5.5,
+        pubdate=datetime.now()
+    )
+
+    assert len(list(publisher.booksale_set.all())) == 1
+
